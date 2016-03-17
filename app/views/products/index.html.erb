@@ -1,0 +1,50 @@
+<%= form_tag products_path, :method => :get do %>
+  <p>
+    <%= text_field_tag :query, params[:query] %>
+    <%= submit_tag "Search", :name => nil %>
+  </p>
+<% end %>
+
+<div id="products">
+  <% for row in @results %>
+    <li>
+      Name: <%= row.name %>
+      Description: <%= row.description %>
+      rating: <%= row.rating %>
+      Category: <%= row.category %>
+      Status: <%= row.status %>
+    </li>
+  <% end %>
+</div>
+
+<div id="facets">
+  <h3>Category</h3>
+  <ul>
+    <%if params[:category].nil? %>
+      <% for row in @products.facet(:category).rows %>
+        <li>
+          <%= link_to row.value, :category => row.value %> (<%= row.count %>)
+          <% if params[:category].present? %>
+            <strong><%= row.value %></strong> (<%= link_to "remove", :category => nil %>)
+          <% end %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+</div>
+
+<div id="facets">
+  <h3>Location</h3>
+  <ul>
+    <% if params[:location].nil? %>
+      <% for row in @products.facet(:location).rows %>
+        <li>
+            <%= link_to row.value, :location => row.value %> (<%= row.count %>)
+          <% if params[:category].present? %>
+            <strong><%= row.value %></strong> (<%= link_to "remove", :location => nil %>)
+          <% end %>
+        </li>
+      <% end %>  
+    <% end %>
+  </ul>
+</div>
