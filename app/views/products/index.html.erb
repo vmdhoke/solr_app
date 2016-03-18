@@ -1,50 +1,36 @@
-<%= form_tag products_path, :method => :get do %>
+<%= form_tag root_path, :method => :get do %>
   <p>
     <%= text_field_tag :query, params[:query] %>
+    <% if @products.present? %>
+      <% category = [''] %>
+      <% category << @products.facet(:category).rows.map(&:value) %>
+      <%= select_tag :category, options_for_select(category.flatten,selected: params[:category]) %> 
+      <% location = [''] %>
+      <% location << @products.facet(:location).rows.map(&:value) %>
+      <%= select_tag :location, options_for_select(location.flatten,selected: params[:location]) %>
+    <% end %>
     <%= submit_tag "Search", :name => nil %>
   </p>
 <% end %>
 
 <div id="products">
-  <% for row in @results %>
-    <li>
-      Name: <%= row.name %>
-      Description: <%= row.description %>
-      rating: <%= row.rating %>
-      Category: <%= row.category %>
-      Status: <%= row.status %>
-    </li>
+  <%if @results.present?%>
+    <h2> Results found <%= @results.count%> </h2>
+    <% for row in @results %>
+      <li>
+        Name: <%= row.name %>
+        Description: <%= row.description %>
+        rating: <%= row.rating %>
+        Category: <%= row.category %>
+        Status: <%= row.status %>
+        Per Day Rent:<%= row.per_day_rent%>
+        Category: <%= row.category%>
+        Score: <%= row.score%>
+        Location: <%= row.location%>
+        <br><br>
+      </li>
+    <% end %>
+  <% else%>
+    <h2>No Results Found</h2>
   <% end %>
-</div>
-
-<div id="facets">
-  <h3>Category</h3>
-  <ul>
-    <%if params[:category].nil? %>
-      <% for row in @products.facet(:category).rows %>
-        <li>
-          <%= link_to row.value, :category => row.value %> (<%= row.count %>)
-          <% if params[:category].present? %>
-            <strong><%= row.value %></strong> (<%= link_to "remove", :category => nil %>)
-          <% end %>
-        </li>
-      <% end %>
-    <% end %>
-  </ul>
-</div>
-
-<div id="facets">
-  <h3>Location</h3>
-  <ul>
-    <% if params[:location].nil? %>
-      <% for row in @products.facet(:location).rows %>
-        <li>
-            <%= link_to row.value, :location => row.value %> (<%= row.count %>)
-          <% if params[:category].present? %>
-            <strong><%= row.value %></strong> (<%= link_to "remove", :location => nil %>)
-          <% end %>
-        </li>
-      <% end %>  
-    <% end %>
-  </ul>
 </div>
